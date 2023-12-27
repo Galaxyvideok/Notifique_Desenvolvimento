@@ -19,6 +19,7 @@ struct Localizacao {
 };
 typedef struct Localizacao Localizacao;
 struct Usuario {
+    int id;
     char nome[TAMNOME];
     char senha[TAMNOME];
     Localizacao posicao;
@@ -44,7 +45,13 @@ FILE * abrirArquivo(char * nomeArq, char * modo) {
 }
 
 int pesquisar(Notificacao *lista, int pesq){
-
+    int i;
+    for (i = 0; i < TAMNOME; i++){
+        if (lista[i].quemNotifica.id == pesq){
+            return i;
+        }
+    }
+    return -1;
 }
 
 void gravarArquivo(FILE * arquivo, Notificacao not) {
@@ -118,6 +125,16 @@ int notiOpcoes(){
 	return op;	
 }
 
+void imprimirNotificacao(Notificacao not){
+    printf("--------------------------------\n");
+    printf("Tipo: %s\n", not.tipoProblema);
+    printf("Usuario: %s\n", not.quemNotifica.nome);
+    printf("Senha do Usuario: %s\n", not.quemNotifica.senha);
+    printf("Descriçao: %s\n", not.descricao);
+    printf("Localizaçao: %.2f %.2f\n", not.quemNotifica.posicao.latitude,not.quemNotifica.posicao.longetude);
+    printf("--------------------------------\n");
+}
+
 int main(){
     FILE * arquivoGuardaDados;
     FILE * arquivoListaUsuarios;
@@ -171,6 +188,7 @@ int main(){
         default:
             break;
         }
+        imprimirNotificacao(notificacaoAtual);
     } while (op != 0);
     printf("\n%s\n", CORTE);
     return 0;
