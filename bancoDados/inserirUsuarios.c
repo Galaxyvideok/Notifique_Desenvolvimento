@@ -1,136 +1,99 @@
-/*Esse codigo deve ser a parte responsavel por criar as notificaçoes, para exemplificar as notificaçoes 
-serao criadas em formas de arquivo para depois terem seus dados enviados*/
+/*Essa parte do codigo servira para cadastrar outros usuarios e gerar uma lista com 
+os nomes, senhas e id's de cada um deles e salvar em um arquivo binario chamado: 'listaUsuarios.bin'*/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
-#define INICIO "--------INICIO--------"
-#define RESULTADO "-----------RESULTADO-----------"
-#define CORTE "-------------------------------------"
-#define MAXDESC 10000
-#define TAMNOME 100
-#define TAMSENHA 15
+#define MAX_USERS 100
 
-struct Localizacao{
-    int latitude;
-    int longetude;
+struct Localizacao {
+    float latitude;
+    float longitude;
 };
+
 typedef struct Localizacao Localizacao;
 
-struct Data{
-    int dia;
-    int mes;
-    int ano;
-};
-typedef struct Data Data;
-
-struct Usuario{
-    char nome[TAMNOME];
+struct Usuario {
     int id;
-    Data dataNascimento;
-    Localizacao localAtual;
-    char email[TAMNOME];
-    char senha[TAMSENHA];
+    char nome[100];
+    char senha[100];
+    Localizacao posicao;
 };
+
 typedef struct Usuario Usuario;
 
-struct Notificacao{
-    Usuario conta;
-    char descricao[MAXDESC];
-    FILE * foto;
-    FILE * video;
-};
-typedef struct Notificacao Notificacao;
-
-int aleatorio(int n){
-    return ( rand() % n) + 1;
-}
-
-FILE * abrirArquivo(char * nomeArq, char * modo) {
-    FILE * arq;
-    arq = fopen( nomeArq, modo );
-    if ( arq == NULL) {
+FILE* abrirArquivo(char* nomeArq, char* modo) {
+    FILE* arq = fopen(nomeArq, modo);
+    if (arq == NULL) {
         printf("ERRO ao abrir o arquivo.");
         exit(-1);
     }
     return arq;
 }
 
-void gravarArquivo(FILE * arquivo, Notificacao * vetor, int qtde) {
-    fwrite( &qtde, sizeof(int), 1, arquivo  );
-    fwrite( vetor, sizeof(Notificacao), qtde, arquivo  );
+void gravarArquivo2(FILE* arquivo, Usuario* vetor, int qtde) {
+    fwrite(&qtde, sizeof(int), 1, arquivo);
+    fwrite(vetor, sizeof(Usuario), qtde, arquivo);
 }
 
-void carregarArquivo(FILE * arquivo, Notificacao * vetor, int *qtde) {
-    fread( qtde, sizeof(int), 1, arquivo  );
-    fread( vetor, sizeof(Notificacao), *qtde, arquivo  );
-}
+void cadastrarUsuario(Usuario* usuarios, int* quantidadeUsuarios) {
+    if (*quantidadeUsuarios < MAX_USERS) {
+        Usuario novoUsuario;
+        printf("Cadastro de novo usuario:\n");
+        printf("Digite o nome do usuario: ");
+        scanf("%s", novoUsuario.nome);
+        printf("Digite a senha: ");
+        scanf("%s", novoUsuario.senha);
+        novoUsuario.id = rand() % 1000;
+        printf("Digite a latitude: ");
+        scanf("%f", &novoUsuario.posicao.latitude);
+        printf("Digite a longitude: ");
+        scanf("%f", &novoUsuario.posicao.longitude);
 
-void inserirUsuario(Usuario *user, int *indiceAtual){
-    // id gerar aleatorio
-    printf("digite o nome do usuario: ");
-    scanf(" %99[^\n]s", user[*indiceAtual].nome);
-    printf("Digite o e-mail do usuario: ");
-    scanf(" %99[^\n]s", user[*indiceAtual].email);
-    printf("Digite a senha do usuario: ");
-    scanf(" %99[^\n]s", user[*indiceAtual].senha);
-    printf("Digite a data de nascimento do usuario: ");
-    scanf("%d%d%d", user[*indiceAtual].dataNascimento.dia,user[*indiceAtual].dataNascimento.mes,user[*indiceAtual].dataNascimento.ano);
-    // localizaçao gerar por funcao
-}
-
-void listar(Usuario * vetor, int qtde) {
-    int i;
-    printf("\n%s\n", RESULTADO);
-    printf("Senha|Nome                   |telefone|e-mail              |Salario   |\n");
-    for( i=0; i < qtde; i++) {
-        // printf("%9d|%-23s|%8d|%-20s|%10.2f|\n", vetor[i].matricula, vetor[i].individuo.nome, vetor[i].individuo.telefone, vetor[i].individuo.email,vetor[i].salario );
+        usuarios[*quantidadeUsuarios] = novoUsuario;
+        (*quantidadeUsuarios)++;
+    } else {
+        printf("Limite de usuarios atingido!\n");
     }
-    printf("\n%s\n", CORTE);
 }
 
-int menu(){
-	int op;
-	printf("\n\nSISTEMA NOTIFIQUE\n\n");
-	printf("1 - Inserir usuario\n");
-    printf("2 - Criar notificação\n");
-	printf("0 - Sair\n");
-	do {
-		printf("Escolha sua opção: ");
-		scanf(" %d", &op);
-	} while(op < 0 || op > 2);
-	return op;	
-}
+int main() {
+    FILE* arquivoUsuarios;
+    Usuario usuarios[MAX_USERS];
+    int quantidadeUsuarios = 0;
 
-int main(){
-    Usuario listaUsuario[MAXDESC];
-    int indiceAtual = 0;
+    arquivoUsuarios = abrirArquivo("listaUsuarios.bin", "wb");
+
     int op;
-    Notificacao notAtual;
-    FILE * arq;
-    // arq = abrirArquivo("..bancoDados/notificacaoEnv.bin", "wb");
-    printf("\n%s\n", INICIO);
     do {
-		op = menu();
-		switch ( op ) {
-			case 0:
-                fclose(arq);
-				break;
+        printf("\nMENU:\n");
+        printf("1 - Cadastrar usuario\n");
+        printf("0 - Sair\n");
+        printf("Escolha sua opcao: ");
+        scanf("%d", &op);
 
-			case 1:
-                inserirUsuario(listaUsuario,&indiceAtual);
-                
-                indiceAtual++;
-				break;
-			case 2:
+        switch (op) {
+            case 1:
+                cadastrarUsuario(usuarios, &quantidadeUsuarios);
+                break;
+            case 0:
+                break;
+            default:
+                printf("Opcao invalida!\n");
+                break;
+        }
+    } while (op != 0);
 
-				break;
-			
-			default:
-				printf ("\n\nOpção inválida!\n\n");
-		}
-	} while (op != 0);
+    // Grava a quantidade total de usuários no início do arquivo
+    fseek(arquivoUsuarios, 0, SEEK_SET);
+    fwrite(&quantidadeUsuarios, sizeof(int), 1, arquivoUsuarios);
+
+    // Grava os usuários no arquivo
+    gravarArquivo2(arquivoUsuarios, usuarios, quantidadeUsuarios);
+
+    fclose(arquivoUsuarios);
+
     return 0;
 }
+
