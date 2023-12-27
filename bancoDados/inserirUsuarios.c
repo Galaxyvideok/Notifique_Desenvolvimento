@@ -86,7 +86,7 @@ void listar(Usuario * vetor, int qtde) {
     printf("\n%s\n", RESULTADO);
     printf("Senha|Nome                   |telefone|e-mail              |Salario   |\n");
     for( i=0; i < qtde; i++) {
-        printf("%9d|%-23s|%8d|%-20s|%10.2f|\n", vetor[i].matricula, vetor[i].individuo.nome, vetor[i].individuo.telefone, vetor[i].individuo.email,vetor[i].salario  );
+        // printf("%9d|%-23s|%8d|%-20s|%10.2f|\n", vetor[i].matricula, vetor[i].individuo.nome, vetor[i].individuo.telefone, vetor[i].individuo.email,vetor[i].salario );
     }
     printf("\n%s\n", CORTE);
 }
