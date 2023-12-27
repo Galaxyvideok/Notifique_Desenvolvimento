@@ -33,9 +33,9 @@ FILE* abrirArquivo(char* nomeArq, char* modo) {
 }
 
 void gravarArquivo2(FILE* arquivo, Usuario* vetor, int qtde) {
-    fwrite(&qtde, sizeof(int), 1, arquivo);
     fwrite(vetor, sizeof(Usuario), qtde, arquivo);
 }
+
 
 void cadastrarUsuario(Usuario* usuarios, int* quantidadeUsuarios) {
     if (*quantidadeUsuarios < MAX_USERS) {
@@ -63,7 +63,7 @@ int main() {
     Usuario usuarios[MAX_USERS];
     int quantidadeUsuarios = 0;
 
-    arquivoUsuarios = abrirArquivo("listaUsuarios.bin", "wb");
+    arquivoUsuarios = abrirArquivo("../listaUsuarios.bin", "wb");
 
     int op;
     do {
