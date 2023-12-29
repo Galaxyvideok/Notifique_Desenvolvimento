@@ -18,6 +18,7 @@ struct Localizacao {
     float longetude;
 };
 typedef struct Localizacao Localizacao;
+
 struct Usuario {
     int id;
     char nome[TAMNOME];
@@ -25,6 +26,7 @@ struct Usuario {
     Localizacao posicao;
 };
 typedef struct Usuario Usuario;
+
 struct Notificacao {
     Usuario quemNotifica;
     char tipoProblema[TAMNOME];
@@ -35,62 +37,21 @@ struct Notificacao {
 typedef struct Notificacao Notificacao;
 
 FILE * abrirArquivo(char * nomeArq, char * modo) {
-    FILE * arq;
-    arq = fopen( nomeArq, modo );
-    if ( arq == NULL) {
+    FILE * arq = fopen(nomeArq, modo);
+    if (arq == NULL) {
         printf("ERRO ao abrir o arquivo.");
         exit(-1);
     }
     return arq;
 }
 
-int pesquisar(Notificacao *lista, int pesq){
-    int i;
-    for (i = 0; i < TAMNOME; i++){
-        if (lista[i].quemNotifica.id == pesq){
-            return i;
-        }
-    }
-    return -1;
-}
-
 void gravarArquivo(FILE * arquivo, Notificacao not) {
-    fwrite( &not, sizeof(Notificacao), 1, arquivo);
-}
-
-void carregarArquivo(FILE * arquivo, Notificacao not) {
-    fwrite( &not, sizeof(Notificacao), 1, arquivo);
+    fwrite(&not, sizeof(Notificacao), 1, arquivo);
 }
 
 void carregarArquivo2(FILE * arquivo, Notificacao * vetor, int *qtde) {
-    fread( qtde, sizeof(int), 1, arquivo  );
-    fread( vetor, sizeof(Notificacao), *qtde, arquivo  );
-}
-
-void procurarTipo(char *nome, int numeroTipo){
-    if (numeroTipo == 1){
-        strcat(nome,"Buraco na Rua");
-    }else if (numeroTipo == 2){
-        strcat(nome,"Poste de Luz Queimado");
-    }else if (numeroTipo == 3){
-        strcat(nome,"Lixo Urbano em Local Publico");
-    }else if (numeroTipo == 3){
-        strcat(nome,"Semaforo Danificado");
-    }else if (numeroTipo == 4){
-        strcat(nome,"Foco de Agua Parada");
-    }else{
-        strcat(nome,"Foco de Incendio");
-    }
-}
-
-// essa funçao tambem deve ser automatizada
-void buscarUsuario(Notificacao *not, Notificacao * listaUsuarios){
-    int idUsuario;
-    do{
-        printf("Digite o id do usuario: ");
-        scanf("%d", idUsuario);
-    } while (pesquisar(listaUsuarios,idUsuario) == -1);
-    not->quemNotifica = listaUsuarios[idUsuario].quemNotifica;
+    fread(qtde, sizeof(int), 1, arquivo);
+    fread(vetor, sizeof(Notificacao), *qtde, arquivo);
 }
 
 void inserirDados(Notificacao *notiAtual, int desci){
@@ -139,17 +100,22 @@ int main(){
     FILE * arquivoGuardaDados;
     FILE * arquivoListaUsuarios;
     Notificacao notificacaoAtual;
-    Notificacao listaUsuarios[TAMNOME];
-    int i;
-    int op  = 99;
-    arquivoGuardaDados = abrirArquivo("..bancoDados/notificacaoEnv.bin", "wb");
-    for (i = 0; i < MAXDESC; i++){
-        carregarArquivo2(arquivoListaUsuarios,listaUsuarios,i);
-    }
-    printf("\n%s\n", CORTE);
+    Notificacao listaUsuarios[MAXDESC]; // Alteração para listaUsuarios
+
+    int quantidadeUsuarios = 0; // Nova variável para armazenar a quantidade de usuários
+
+    arquivoListaUsuarios = abrirArquivo("..bancoDados/listaUsuarios.bin", "rb");
+    carregarArquivo2(arquivoListaUsuarios, listaUsuarios, &quantidadeUsuarios);
+    fclose(arquivoListaUsuarios);
+
+    int op = 99;
     do{
         buscarUsuario(&notificacaoAtual,listaUsuarios);
+        arquivoListaUsuarios = abrirArquivo("..bancoDados/listaUsuarios.bin", "rb");
+        carregarArquivo2(arquivoListaUsuarios,listaUsuarios,TAMNOME);
+        fclose(arquivoListaUsuarios);
         op = notiOpcoes();
+        arquivoGuardaDados = abrirArquivo("..bancoDados/notificacaoEnv.bin", "wb");
         switch (op){
         case 1:
             inserirDados(&notificacaoAtual,op);
