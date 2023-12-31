@@ -8,8 +8,6 @@ pedir dele os dados da notificacao, escolhendo tambem os tipos disponiveis de no
 
 #define TAMNOME 100
 #define MAXDESC 1000
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 struct Localizacao {
     float latitude;
@@ -25,19 +23,11 @@ struct Usuario {
 };
 typedef struct Usuario Usuario;
 
-struct Imagem {
-    unsigned char *dados;
-    int largura;
-    int altura;
-    int canais;
-};
-typedef struct Imagem Imagem;
-
 struct Notificacao {
     Usuario quemNotifica;
     char tipoProblema[TAMNOME];
     char descricao[TAMNOME];
-    Imagem imagem; // Estrutura separada para a imagem
+    //imagem da notificaçao
 };
 typedef struct Notificacao Notificacao;
 
@@ -52,17 +42,6 @@ FILE *abrirArquivo(char *nomeArq, char *modo) {
 
 void gravarArquivo(FILE *arquivo, Notificacao not) {
     fwrite(&not, sizeof(Notificacao), 1, arquivo);
-
-    // Se houver imagem na notificação, escreve os dados da imagem no arquivo
-    if (not.imagem.dados != NULL) {
-        fwrite(not.imagem.dados, sizeof(unsigned char), not.imagem.largura * not.imagem.altura * not.imagem.canais, arquivo);
-    }
-}
-
-void liberarMemoria(Imagem *img) {
-    if (img->dados != NULL) {
-        stbi_image_free(img->dados);
-    }
 }
 
 void carregarArquivo2(FILE *arquivo, Usuario *vetor, int *qtde) {
@@ -90,19 +69,6 @@ void inserirDados(Notificacao *notiAtual, int desc) {
     scanf("%f", &notiAtual->quemNotifica.posicao.latitude);
     printf("Longitude: ");
     scanf("%f", &notiAtual->quemNotifica.posicao.longitude);
-
-    char nomeArquivoImagem[TAMNOME];
-    printf("Digite o nome do arquivo da imagem: ");
-    scanf(" %[^\n]s", nomeArquivoImagem);
-
-    // Carrega a imagem usando a STB Image
-    notiAtual->imagem.dados = stbi_load(nomeArquivoImagem, &notiAtual->imagem.largura, &notiAtual->imagem.altura, &notiAtual->imagem.canais, 0);
-
-    if (notiAtual->imagem.dados == NULL) {
-        printf("Erro ao carregar a imagem.\n");
-        liberarMemoria(&notiAtual->imagem);
-        exit(-1);
-    }
 }
 
 void imprimirNotificacao(Notificacao not) {
@@ -151,7 +117,7 @@ int main() {
 
     int quantidadeUsuarios = 0;
 
-    arquivoListaUsuarios = abrirArquivo("../../bancoDados/listaUsuarios.bin", "rb");
+    arquivoListaUsuarios = abrirArquivo("/home/lucas/Documentos/simulaSistema/Notifique_Desenvolvimento/bancoDados/listaUsuarios.bin", "rb");
     carregarArquivo2(arquivoListaUsuarios, listaUsuarios, &quantidadeUsuarios);
     fclose(arquivoListaUsuarios);
 
@@ -186,7 +152,7 @@ int main() {
         case 5:
         case 6:
             inserirDados(&notificacaoAtual, op);
-            arquivoGuardaDados = abrirArquivo("../../bancoDados/notificacaoEnv.bin", "wb");
+            arquivoGuardaDados = abrirArquivo("/home/lucas/Documentos/simulaSistema/Notifique_Desenvolvimento/bancoDados/notificacaoEnv.bin", "wb");
             gravarArquivo(arquivoGuardaDados, notificacaoAtual);
             fclose(arquivoGuardaDados);
             imprimirNotificacao(notificacaoAtual);
@@ -197,9 +163,6 @@ int main() {
             printf("Opção inválida.\n");
             break;
     }
-    
-
-    liberarMemoria(&notificacaoAtual.imagem);
 
     return 0;
 }
