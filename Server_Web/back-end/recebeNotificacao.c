@@ -1,6 +1,6 @@
 /*Esse codigo deve ser a parte responsavel por receber as notificaçoes e criar um arquivo que armazena os dados
 , um arquvio chamado: 'notificacaoEnv.bin' alem disso nessa parte vai ser feito uma simulaçao de como os dados serao 
-listados no relatorio*/
+listados no relatorio. Nesse codigo primeiro sera lido do arquivo binario a notificaçao e sera exibida na tela*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -92,8 +92,20 @@ void buscarUsuarioPorNome(Usuario *usuario, char *nomeProcurado, Usuario *listaU
     exit(-1);
 }
 
-int menu(){
-    
+int menu(int *notSemResponsavel, int *notComResponsavel, Notificacao notiAtual){
+    int op;
+    printf("\n------------------Notificaçoes sem responsaveis------------------\n");
+    printf("Total: %d\n", notSemResponsavel);
+    printf("\n------------------Notificaçoes com responsaveis------------------\n");
+    printf("Total: %d\n", notComResponsavel);
+    imprimirNotificacao(notiAtual); // deve ser imprimido a notificaçao
+    printf("\n\nMENU\n\n");
+    printf("1 - Encaminhar Notificaçao\n");
+    printf("2 - Pedir Relatorio\n");
+    printf("3 - Sair\n");
+    printf("Digite a opçao: ");
+    scanf("%d",&op);
+    return op;
 }
 
 int main() {
